@@ -31,7 +31,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class MainActivity extends Activity implements
-        GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, View.OnClickListener {
+        GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
 
 
@@ -41,6 +41,7 @@ public class MainActivity extends Activity implements
 //    private static final String STATE_RESOLVING_ERROR = "resolving_error";
     protected static final String TAG = "basic-location-sample";
     private GoogleApiClient mGoogleApiClient;
+
     protected Location mLastLocation;
     protected TextView mLatitudeText;
     protected TextView mLongitudeText;
@@ -63,18 +64,6 @@ public class MainActivity extends Activity implements
     }
 
 
-
-    private Intent getDefaultShareIntent(){
-        Intent intent = new Intent(Intent.ACTION_SEND);
-        intent.setType("text/plain");
-        intent.putExtra(Intent.EXTRA_TEXT, mShare);
-        return intent;
-    }
-
-
-
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -87,17 +76,16 @@ public class MainActivity extends Activity implements
 
     }
 
-    public void onStartClick(View view) {
-        PostLocation postlocation = new PostLocation();
-        postlocation.execute();
-        Toast.makeText(this, getString(R.string.submit_label), Toast.LENGTH_SHORT).show();
+    public void onGameStartClick(View view) {
+        StartGame startgame = new StartGame();
+        startgame.execute();
+        Toast.makeText(this, getString(R.string.button_start_msg), Toast.LENGTH_SHORT).show();
     }
 
     public void onLocateClick(View view) {
-        //PostLocation postlocation = new PostLocation();
-        //postlocation.execute();
-        //Toast.makeText(this, getString(R.string.submit_label), Toast.LENGTH_SHORT).show();
-        Toast.makeText(this, "this should check my progress", Toast.LENGTH_SHORT).show();
+        CheckLocation checklocation = new CheckLocation();
+        checklocation.execute();
+        Toast.makeText(this, getString(R.string.button_locate_msg), Toast.LENGTH_SHORT).show();
     }
 
     /**
@@ -112,14 +100,21 @@ public class MainActivity extends Activity implements
     }
 
 
-    /** @Override
+     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
     // Inflate the menu; this adds items to the action bar if it is present.
     getMenuInflater().inflate(R.menu.menu_main, menu);
     mShareActionProvider = (ShareActionProvider) menu.findItem(R.id.share).getActionProvider();
     mShareActionProvider.setShareIntent(getDefaultShareIntent());
     return true;
-    } */
+    }
+
+    private Intent getDefaultShareIntent(){
+        Intent intent = new Intent(Intent.ACTION_SEND);
+        intent.setType("text/plain");
+        intent.putExtra(Intent.EXTRA_TEXT, mShare);
+        return intent;
+    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -136,7 +131,7 @@ public class MainActivity extends Activity implements
         return super.onOptionsItemSelected(item);
     }
 
-    public void onConnected(Bundle connectionHint) {
+    /*public void onConnected(Bundle connectionHint) {
         mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
                 mGoogleApiClient);
         if (mLastLocation != null) {
@@ -149,8 +144,22 @@ public class MainActivity extends Activity implements
             Toast.makeText(this, R.string.no_location_detected, Toast.LENGTH_LONG).show();
             mShare = "I have no idea where you are";
         }
+    }*/
+    @Override
+    public void onConnected(Bundle connectionHint) {
+        // Provides a simple way of getting a device's location and is well suited for
+        // applications that do not require a fine-grained location and that do not need location
+        // updates. Gets the best and most recent location currently available, which may be null
+        // in rare cases when a location is not available.
+        mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+        if (mLastLocation != null) {
+            mLatitudeText.setText(String.valueOf(mLastLocation.getLatitude()));
+            mLongitudeText.setText(String.valueOf(mLastLocation.getLongitude()));
+            mShare = "I'm at " + String.valueOf(mLastLocation.getLatitude()) + " degrees latitude and " + String.valueOf(mLastLocation.getLongitude()) + " degrees longitude";
+        } else {
+            Toast.makeText(this, R.string.no_location_detected, Toast.LENGTH_LONG).show();
+        }
     }
-
     @Override
     public void onConnectionFailed(ConnectionResult result) {
         // Refer to the javadoc for ConnectionResult to see what error codes might be returned in
@@ -166,17 +175,12 @@ public class MainActivity extends Activity implements
         mGoogleApiClient.connect();
     }
 
-    @Override
-    public void onClick(View v) {
 
-    }
-
-    //Begin Test MongoDB -- ksymer is working here
     /**
      * Represents a geographical location.
      */
 
-    private class PostLocation extends AsyncTask<Void, Void, String> {
+    private class StartGame extends AsyncTask<Void, Void, String> {
         @Override
         protected String doInBackground(Void... voids) {
 
@@ -204,7 +208,7 @@ public class MainActivity extends Activity implements
                 int game_id = 1;
                 int player_id = 0;
                 int time_interval = 0;
-                int is_winner = 0;
+                boolean is_winner = false;
 
                 //insert lat/long
                 if (mLastLocation != null) {
@@ -235,9 +239,16 @@ public class MainActivity extends Activity implements
                 return getString(R.string.host_error); //"@string/host_error"
             }
         }
-    }//END Test MongoDB
+    }
 
-
+    private class CheckLocation extends AsyncTask<Void, Void, String> {
+        @Override
+        protected String doInBackground(Void... voids) {        //periodically check player location and progress
+            //test
+            //fill in logic
+            return getString(R.string.button_locate_msg);
+        }
+    }
 
     public class QueryActivity extends Activity {
 
@@ -249,7 +260,7 @@ public class MainActivity extends Activity implements
         public String passLong;
         public String passTime;
 
-        @Override
+        /*@Override
         protected void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
             setContentView(R.layout.activity_main);
@@ -261,7 +272,7 @@ public class MainActivity extends Activity implements
             queryLong = (TextView) findViewById(R.id.longitude_text);
             //queryTime = (TextView) findViewById(R.id.time_query);
 
-        }
+        }*/
 
 
         /*@Override
