@@ -137,20 +137,7 @@ public class MainActivity extends Activity implements
         return super.onOptionsItemSelected(item);
     }
 
-    /*public void onConnected(Bundle connectionHint) {
-        mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
-                mGoogleApiClient);
-        if (mLastLocation != null) {
-            mLatitudeText.setText(String.valueOf(mLastLocation.getLatitude()));
-            mLongitudeText.setText(String.valueOf(mLastLocation.getLongitude()));
-            mShare = "I'm at " + String.valueOf(mLastLocation.getLatitude())
-                    + " degrees Latitude and " + String.valueOf(mLastLocation.getLongitude())
-                    + " degrees Longitude";
-        }   else {
-            Toast.makeText(this, R.string.no_location_detected, Toast.LENGTH_LONG).show();
-            mShare = "I have no idea where you are";
-        }
-    }*/
+
     @Override
     public void onConnected(Bundle connectionHint) {
         // Provides a simple way of getting a device's location and is well suited for
@@ -223,8 +210,8 @@ public class MainActivity extends Activity implements
                     lastLocation.put("GameID", game_id);
                     lastLocation.put("PlayerID", player_id);
                     lastLocation.put("TimeInterval", time_interval);
-                    lastLocation.put("Latitude", String.valueOf(mLastLocation.getLatitude()));
-                    lastLocation.put("Longitude", String.valueOf(mLastLocation.getLongitude()));
+                    lastLocation.put("Latitude", mLastLocation.getLatitude());
+                    lastLocation.put("Longitude", mLastLocation.getLongitude());
                     lastLocation.put("IsWinner", is_winner);
                     lastLocation.put("Time", String.valueOf(now));
 
