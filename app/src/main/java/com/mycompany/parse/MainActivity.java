@@ -35,7 +35,7 @@ public class MainActivity extends Activity implements
 
 
 
-//    private static final String DIALOG_ERROR = "dialog error";
+    private static final String DIALOG_ERROR = "dialog error";
 //    private static final int REQUEST_RESOLVE_ERROR = 1001;
 //    private boolean mResolvingError = false;
 //    private static final String STATE_RESOLVING_ERROR = "resolving_error";
@@ -62,6 +62,8 @@ public class MainActivity extends Activity implements
         }
     }
 
+
+
     private Intent getDefaultShareIntent(){
         Intent intent = new Intent(Intent.ACTION_SEND);
         intent.setType("text/plain");
@@ -83,6 +85,19 @@ public class MainActivity extends Activity implements
 
         buildGoogleApiClient();
 
+    }
+
+    public void onStartClick(View view) {
+        PostLocation postlocation = new PostLocation();
+        postlocation.execute();
+        Toast.makeText(this, getString(R.string.submit_label), Toast.LENGTH_SHORT).show();
+    }
+
+    public void onLocateClick(View view) {
+        //PostLocation postlocation = new PostLocation();
+        //postlocation.execute();
+        //Toast.makeText(this, getString(R.string.submit_label), Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "this should check my progress", Toast.LENGTH_SHORT).show();
     }
 
     /**

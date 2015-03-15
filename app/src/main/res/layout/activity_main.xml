@@ -47,35 +47,24 @@
         android:textIsSelectable="true"
         android:layout_marginTop="@dimen/text_margin"
         android:textSize="@dimen/lat_long_text_size"/>
-
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Where am I?"
-        android:onClick="onPostClick"
-        android:id="@+id/Location"
-        android:layout_marginBottom="63dp"
-        android:layout_above="@+id/button"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true" />
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/colder"
         android:id="@+id/textView"
-        android:layout_marginBottom="124dp"
-        android:layout_above="@+id/Location"
-        android:layout_centerHorizontal="true"
-        android:textColor="#ff2d31ff" />
+        android:textColor="#ff2d31ff"
+        android:layout_centerVertical="true"
+        android:layout_alignLeft="@+id/textView2"
+        android:layout_alignStart="@+id/textView2" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/warmer"
         android:id="@+id/textView2"
-        android:layout_marginTop="18dp"
         android:textColor="#ffff7c25"
-        android:layout_alignTop="@+id/textView"
+        android:layout_marginTop="35dp"
+        android:layout_below="@+id/textView"
         android:layout_centerHorizontal="true" />
 
     <TextView
@@ -84,11 +73,28 @@
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:text="@string/winner"
         android:id="@+id/textView3"
-        android:layout_above="@+id/textView"
+        android:textColor="#000000"
+        android:layout_below="@+id/longitude_label"
         android:layout_centerHorizontal="true"
-        android:layout_marginBottom="73dp"
-        android:textColor="#000000" />
+        android:layout_marginTop="102dp" />
 
-
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Start new game"
+        android:onClick="onStartClick"
+        android:id="@+id/button_start"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Get my location"
+        android:onClick="onLocateClick"
+        android:id="@+id/button_locate"
+        android:layout_alignTop="@+id/button_start"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true" />
 
 </RelativeLayout>
