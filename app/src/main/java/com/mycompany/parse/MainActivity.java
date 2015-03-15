@@ -180,6 +180,7 @@ public class MainActivity extends Activity implements
      * Represents a geographical location.
      */
 
+    //hider starts game and stores current location as target
     private class StartGame extends AsyncTask<Void, Void, String> {
         @Override
         protected String doInBackground(Void... voids) {
@@ -196,7 +197,7 @@ public class MainActivity extends Activity implements
                 SimpleDateFormat time = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss");
                 String now = time.format(new Date());
 
-                /* Mongo data structure:
+                /* Mongo collection document structure:
                     "GameID": 1,
                     "PlayerID": 0,
                     "TimeInterval: 0,
@@ -221,12 +222,13 @@ public class MainActivity extends Activity implements
                     lastLocation.put("IsWinner", is_winner);
                     lastLocation.put("Time", String.valueOf(now));
 
-                    //coll.insert(lastLocation, WriteConcern.SAFE);
-
                     WriteResult result = coll.insert(lastLocation, WriteConcern.SAFE);
                     //Log.i(result.toString());
 
                     mongoClient.close();
+
+                    //if push notifications work, notify other players of game start
+                    //otherwise, use manual sms ;-)
 
                     return getString(R.string.submit_label); //"@string/submit_label"
                 }
@@ -241,14 +243,51 @@ public class MainActivity extends Activity implements
         }
     }
 
-    private class CheckLocation extends AsyncTask<Void, Void, String> {
+    //seekers get hider's location for match calcs later
+    private class GetTargetLocation extends AsyncTask<Void, Void, String> {
         @Override
         protected String doInBackground(Void... voids) {        //periodically check player location and progress
-            //test
-            //fill in logic
+
+            //get hider's lat/long position from db
+
+            //pass coords to CheckLocation as needed
+
             return getString(R.string.button_locate_msg);
         }
     }
+
+    //periodically check player location and progress
+    private class CheckLocation extends AsyncTask<Void, Void, String> {
+        @Override
+        protected String doInBackground(Void... voids) {
+
+            //save old lat/long to previous variables
+
+            //get current lat/long position
+
+            //calculate distance to hider
+
+            //check for winner: is distance is within buffer distance?
+
+                //if yes, end game:
+                    //notify other players of winner
+
+                    //write result to db
+
+               //else keep playing:
+                    //compare current distance to old distance
+
+                    //display warm/cold message
+
+
+            return getString(R.string.button_locate_msg);
+        }
+    }
+
+
+//all of this below was originally in QueryActivity.java. Attempting to merge here.
+//need to reconfigure into three game classes above
+
 
     public class QueryActivity extends Activity {
 
