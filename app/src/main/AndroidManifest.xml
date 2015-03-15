@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.mycompany.parse" >
+    package="com.symerspace.Parse" >
     android:versionCode="1"
     android:versionName="1.0" >
 
@@ -26,7 +26,7 @@
     -->
 
     <permission
-        android:name="com.mycompany.parse"
+        android:name="com.symerspace.Parse"
         android:protectionLevel="signature" />
 
     <uses-permission android:name="com.mycompany.parse.pushnotifications.permission.C2D_MESSAGE" />
@@ -76,7 +76,7 @@
 
                 <!--                       IMPORTANT: Use apps package name!! -->
 
-                <category android:name="com.mycompany.parse" />
+                <category android:name="com.symerspace.Parse" />
             </intent-filter>
         </receiver>
 
