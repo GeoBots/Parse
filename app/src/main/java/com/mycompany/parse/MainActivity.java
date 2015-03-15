@@ -20,6 +20,7 @@ import com.google.android.gms.location.LocationServices;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
+import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientURI;
@@ -47,6 +48,11 @@ public class MainActivity extends Activity implements
     protected TextView mLongitudeText;
     protected ShareActionProvider mShareActionProvider;
     protected String mShare;
+
+    public String passLat;
+    public String passLong;
+    public String winnerWinner;
+
 
 
     @Override
@@ -247,6 +253,62 @@ public class MainActivity extends Activity implements
     private class CheckLocation extends AsyncTask<Void, Void, String> {
         @Override
         protected String doInBackground(Void... voids) {
+
+            try {
+                //create connection
+                String myUri = "mongodb://findme_service:abcde12345@ds043991.mongolab.com:43991/location";
+                String myColl = "FindMe253";
+                MongoClientURI uri = new MongoClientURI(myUri);
+                MongoClient mongoClient = new MongoClient(uri);
+                DB db = mongoClient.getDB(uri.getDatabase());
+                DBCollection coll = db.getCollection(myColl);
+
+                /*
+                DBObject sort = new BasicDBObject("$natural", "-1");
+                DBObject q = new BasicDBObject();*/
+
+                DBCursor cursor = coll.find().sort(new BasicDBObject("$natural", -1));
+
+                //or... DBCursor cursor =
+
+                /*final DBCursor cursor = coll.findOne("{}", sort);
+                    ().sort(sort).limit(1);*/
+
+                passLat = String.valueOf(cursor.get("Latitude"));
+                passLong = String.valueOf(cursor.get("Longitude"));
+                winnerWinner = Boolean.valueOf(cursor.get("IsWinner"));
+
+                Location hidelocation = Double.parseDouble(passlat), Double.parseDouble(passlong);
+                float distance = mLastLocation.distanceTo(hidelocation);
+                cursor.close();
+                mongoClient.close();
+
+                return "who cares";
+
+            } catch(UnknownHostException e) {
+                return getString(R.string.host_error); //"@string/host_error"
+            }
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+
+            try {
+                if (winnerWinner = false) {
+                    mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+                    float distance = mLastLocation.distanceTo(hidelocation);
+
+                }
+                else if (distance <= 75) {
+                    //you win somehow and post to database
+
+                    Toast.makeText(this, "Game Over", Toast.LENGTH_LONG).show();
+                }
+                else if (distance > 75) {
+
+                }
+
+        }
 
             //save old lat/long to previous variables
 
