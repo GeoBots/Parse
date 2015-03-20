@@ -284,11 +284,11 @@ public class MainActivity extends Activity implements
                 //DBObject sort = new BasicDBObject("$natural", "-1");
                 //DBObject q = new BasicDBObject();
 
-                //DBCursor cursor = coll.find().sort(new BasicDBObject("$natural", -1));
+                DBCursor cursor = coll.find().sort(new BasicDBObject("$natural", -1));
 
 
-                BasicDBObject WinnerQuery = new BasicDBObject("IsWinner", true);
-                BasicDBObject TargetQuery = new BasicDBObject("Latitude", new BasicDBObject("$exists", true));
+                //BasicDBObject WinnerQuery = new BasicDBObject("IsWinner", true);
+                //BasicDBObject TargetQuery = new BasicDBObject("Latitude", new BasicDBObject("$exists", true));
 
                 /*cursor = coll.find(query);
                 try {
@@ -341,12 +341,12 @@ public class MainActivity extends Activity implements
                             //write to the database, you won!
                             try {
                                 //create connection
-                                String myUri = "mongodb://findme_service:abcde12345@ds043991.mongolab.com:43991/location";
+                                /*String myUri = "mongodb://findme_service:abcde12345@ds043991.mongolab.com:43991/location";
                                 String myColl = "FindMe253";
                                 MongoClientURI uri = new MongoClientURI(myUri);
                                 MongoClient mongoClient = new MongoClient(uri);
                                 DB db = mongoClient.getDB(uri.getDatabase());
-                                DBCollection coll = db.getCollection(myColl);
+                                DBCollection coll = db.getCollection(myColl);*/
 
                                 SimpleDateFormat time = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss");
                                 String now = time.format(new Date());
@@ -419,12 +419,12 @@ public class MainActivity extends Activity implements
                                 //write to the database, you won!
                                 try {
                                     //create connection
-                                    String myUri = "mongodb://findme_service:abcde12345@ds043991.mongolab.com:43991/location";
+                                    /*String myUri = "mongodb://findme_service:abcde12345@ds043991.mongolab.com:43991/location";
                                     String myColl = "FindMe253";
                                     MongoClientURI uri = new MongoClientURI(myUri);
                                     MongoClient mongoClient = new MongoClient(uri);
                                     DB db = mongoClient.getDB(uri.getDatabase());
-                                    DBCollection coll = db.getCollection(myColl);
+                                    DBCollection coll = db.getCollection(myColl);*/
 
                                     SimpleDateFormat time = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss");
                                     String now = time.format(new Date());
@@ -486,8 +486,6 @@ public class MainActivity extends Activity implements
             } catch (UnknownHostException e) {
                 return getString(R.string.host_error); //"@string/host_error"
             }
-        }catch(UnknownHostException e){
-            return getString(R.string.host_error); //"@string/host_error"
         }
     }
 
