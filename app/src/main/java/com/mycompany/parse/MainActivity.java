@@ -29,7 +29,9 @@ import com.mongodb.WriteResult;
 
 import java.net.UnknownHostException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 public class MainActivity extends Activity implements
         GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
@@ -202,9 +204,13 @@ public class MainActivity extends Activity implements
                     "IsWinner": 0,
                     "Time": "2015-03-14_15:26:00"
                 */
+                //game_id must increment when new game is started; query db for max game_id
                 int game_id = 1;
+                //need to determine player_id dynamically or get username
                 int player_id = 0;
+                //this should increment from user's last location check
                 int time_interval = 0;
+                //hider cannot win; game is starting
                 boolean is_winner = false;
 
                 //insert lat/long
@@ -269,11 +275,25 @@ public class MainActivity extends Activity implements
                 /*
                 Since two records will be written per game, if record set is greater than one game over
                 other way iterate through records to determine iswinner true
-                filter database for game ID or wipe database every game
-                DBObject sort = new BasicDBObject("$natural", "-1");
-                DBObject q = new BasicDBObject();*/
+                filter database for game ID or wipe database every game*/
+                //DBObject sort = new BasicDBObject("$natural", "-1");
+                //DBObject q = new BasicDBObject();
 
-                DBCursor cursor = coll.find().sort(new BasicDBObject("$natural", -1));
+                //DBCursor cursor = coll.find().sort(new BasicDBObject("$natural", -1));
+
+
+                BasicDBObject WinnerQuery = new BasicDBObject("IsWinner", true);
+                BasicDBObject TargetQuery = new BasicDBObject("Latitude", new BasicDBObject("$exists", true));
+
+                /*cursor = coll.find(query);
+                try {
+                    while (cursor.hasNext()) {
+                        //System.out.println(cursor.next());
+                        //do something
+                    }
+                } finally {
+                    cursor.close();
+                }*/
 
                 //or... DBCursor cursor =
 
