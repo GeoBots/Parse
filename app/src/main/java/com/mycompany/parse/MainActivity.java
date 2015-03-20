@@ -1,4 +1,4 @@
-package com.mycompany.Parse;
+package com.mycompany.parse;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -26,6 +26,7 @@ import com.mongodb.MongoClient;
 import com.mongodb.MongoClientURI;
 import com.mongodb.WriteConcern;
 import com.mongodb.WriteResult;
+import com.mycompany.Parse.R;
 
 import java.net.UnknownHostException;
 import java.text.SimpleDateFormat;
@@ -57,7 +58,7 @@ public class MainActivity extends Activity implements
 
     public String passLat;
     public String passLong;
-    public String winnerWinner;
+    public Boolean winnerWinner;
     public Location hidelocation;
 
 
@@ -308,14 +309,14 @@ public class MainActivity extends Activity implements
 
                 //Location hidelocation = Double.parseDouble(passlat), Double.parseDouble(passlong);
                 //float distance = mLastLocation.distanceTo(hidelocation);
-                cursor.close();
-                mongoClient.close();
+                //cursor.close();
+                //mongoClient.close();
 
                 return "who cares";
 
                 //has game been won?//check for winner: is distance is within buffer distance?
-                if (winnerWinner = true) {
-                    Toast.makeText(this, "Game Over, you lost.", Toast.LENGTH_LONG).show();
+                if (winnerWinner == true) {
+                    Toast.makeText(this, getString(R.string.winner), Toast.LENGTH_LONG).show();
                 }
                 //else game has not been won, check progress
                 else {
@@ -397,10 +398,10 @@ public class MainActivity extends Activity implements
                         //compare current distance from previous to determine hot or cold
                         else if (mCurrentDistance < mPreviousDistance) {
                             //display warmer message
-                            Toast.makeText(this, "Warmer", Toast.LENGTH_LONG).show();
+                            Toast.makeText(this, getString(R.string.warmer), Toast.LENGTH_LONG).show();
                         } else {
                             //display colder message
-                            Toast.makeText(this, "Colder", Toast.LENGTH_LONG).show();
+                            Toast.makeText(this, getString(R.string.colder), Toast.LENGTH_LONG).show();
                         }
                     }
                     //calc the first distance
@@ -470,14 +471,15 @@ public class MainActivity extends Activity implements
                                 }
                             }
 
-                            Toast.makeText(this, "Congrats, You Won the Game!", Toast.LENGTH_LONG).show();
+                            Toast.makeText(this, getString(R.string.winner), Toast.LENGTH_LONG).show();
 
                         } catch (UnknownHostException e) {
                             return getString(R.string.host_error); //"@string/host_error"
                         }
                     }
                 }
-
+                cursor.close();
+                mongoClient.close();
                 return getString(R.string.button_locate_msg);
                 //error handling
             } catch (UnknownHostException e) {
