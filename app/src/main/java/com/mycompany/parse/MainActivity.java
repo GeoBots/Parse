@@ -285,17 +285,21 @@ public class MainActivity extends Activity implements
                 other way iterate through records to determine iswinner true
                 filter database for game ID or wipe database every game*/
                 //DBObject sort = new BasicDBObject("$natural", "-1");
-                //DBObject q = new BasicDBObject();
-
-                DBCursor cursor = coll.find().sort(new BasicDBObject("$natural", -1));
+                DBObject q = new BasicDBObject();
 
 
 
-                /*cursor = coll.find(query);
+                DBCursor cursor = coll.find(q);//.sort(new BasicDBObject("$natural", -1));
+
+
+
+                /*DBCursor cursor = coll.find(q);
                 try {
                     while (cursor.hasNext()) {
                         //System.out.println(cursor.next());
-                        //do something
+                        passLat = String.valueOf(cursor.one().get("Latitude"));
+                        passLong = String.valueOf(cursor.one().get("Longitude"));
+                        passWinner = Boolean.valueOf(cursor.one().get("IsWinner"));
                     }
                 } finally {
                     cursor.close();
@@ -306,9 +310,7 @@ public class MainActivity extends Activity implements
                 /*final DBCursor cursor = coll.findOne("{}", sort);
                     ().sort(sort).limit(1);*/
 
-                //passLat = String.valueOf(cursor.one().get("Latitude"));
-                //passLong = String.valueOf(cursor.one().get("Longitude"));
-                //passWinner = Boolean.valueOf(cursor.one().get("IsWinner"));
+
 
                 /*
                 BasicDBObject WinnerQuery = new BasicDBObject("IsWinner", true);
@@ -323,11 +325,17 @@ public class MainActivity extends Activity implements
                 //cursor.close();
                 //mongoClient.close();
 
-                return "who cares";
+                //return "who cares";
+
+                //test value
+                passWinner = true;
 
                 //has game been won? check db for winner: is distance is within buffer distance?
                 if (passWinner) {
-                    Toast.makeText(this, getString(R.string.winner), LENGTH_LONG).show();
+                    //display winner message
+                    makeText(MainActivity.this, getString(R.string.winner), LENGTH_LONG).show();
+
+                    //return getString(R.string.winner);
                 }
                 //else game has not been won, check progress
                 else {
@@ -348,7 +356,7 @@ public class MainActivity extends Activity implements
                         //check buffer distance for winner and write to the database if won
                         if (mCurrentDistance <= mBufferDistance) {
                             //write to the database, you won!
-                            try {
+                            //try {
                                 //create connection
                                 /*String myUri = "mongodb://findme_service:abcde12345@ds043991.mongolab.com:43991/location";
                                 String myColl = "FindMe253";
@@ -390,6 +398,9 @@ public class MainActivity extends Activity implements
 
                                     mongoClient.close();
 
+                                    //display winner message
+                                    makeText(MainActivity.this, getString(R.string.winner), LENGTH_LONG).show();
+
                                     //if push notifications work, notify other players of game start
                                     //otherwise, use manual sms ;-)
 
@@ -399,26 +410,26 @@ public class MainActivity extends Activity implements
                                     return getString(R.string.submit_error); //"@string/submit_error"
                                 }
 
-                            } catch (UnknownHostException e) {
-                                return getString(R.string.host_error); //"@string/host_error"
-                            }
+                            //} catch (UnknownHostException e) {
+                            //    return getString(R.string.host_error); //"@string/host_error"
+                            //}
 
                             //display winner message
-                            makeText(this, getString(R.string.winner), LENGTH_LONG).show();
+                            //makeText(MainActivity.this, getString(R.string.winner), LENGTH_LONG).show();
                         }
                         //compare current distance from previous to determine hot or cold
                         else if (mCurrentDistance < mPreviousDistance) {
                             //display warmer message
-                            makeText(this, getString(R.string.warmer), LENGTH_LONG).show();
+                            makeText(MainActivity.this, getString(R.string.warmer), LENGTH_LONG).show();
                         } else {
                             //display colder message
-                            makeText(this, getString(R.string.colder), LENGTH_LONG).show();
+                            makeText(MainActivity.this, getString(R.string.colder), LENGTH_LONG).show();
                         }
                     }
                     //this is the player's first time checking location
                     else {
 
-                        try {
+                        //try {
                             //get current lat/long position
                             mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
                             //calculate distance to target
@@ -426,7 +437,7 @@ public class MainActivity extends Activity implements
                             //check if winner
                             if (mCurrentDistance < mBufferDistance) {
                                 //write to the database, you won!
-                                try {
+                                //try {
                                     //create connection
                                     /*String myUri = "mongodb://findme_service:abcde12345@ds043991.mongolab.com:43991/location";
                                     String myColl = "FindMe253";
@@ -477,71 +488,26 @@ public class MainActivity extends Activity implements
                                         return getString(R.string.submit_error); //"@string/submit_error"
                                     }
 
-                                } catch (UnknownHostException e) {
-                                    return getString(R.string.host_error); //"@string/host_error"
-                                }
+                                //} catch (UnknownHostException e) {
+                                //    return getString(R.string.host_error); //"@string/host_error"
+                                //}
                             }
 
-                            makeText(this, getString(R.string.winner), LENGTH_LONG).show();
+                            makeText(MainActivity.this, getString(R.string.winner), LENGTH_LONG).show();
 
-                        } catch (UnknownHostException e) {
-                            return getString(R.string.host_error); //"@string/host_error"
-                        }
+                        //} catch (UnknownHostException e) {
+                        //    return getString(R.string.host_error); //"@string/host_error"
+                        //}
                     }
                 }
                 cursor.close();
                 mongoClient.close();
-                return getString(R.string.button_locate_msg);
+                Toast.makeText(MainActivity.this, getString(R.string.game_id), LENGTH_LONG).show();
+                return "3.1415926";
                 //error handling
             } catch (UnknownHostException e) {
                 return getString(R.string.host_error); //"@string/host_error"
             }
         }
     }
-
-
-        private class QueryLocation extends AsyncTask<Void, Void, String> {
-            @Override
-            protected String doInBackground(Void... voids) {
-
-                try {
-                    //create connection
-                    String myUri = "mongodb://joetest:abcde12345@ds043991.mongolab.com:43991/location";
-                    String myColl = "MyLatLng";
-                    MongoClientURI uri = new MongoClientURI(myUri);
-                    MongoClient mongoClient = new MongoClient(uri);
-                    DB db = mongoClient.getDB(uri.getDatabase());
-                    DBCollection coll = db.getCollection(myColl);
-
-                /*
-                DBObject sort = new BasicDBObject("$natural", "-1");
-                DBObject q = new BasicDBObject();*/
-
-                    DBObject cursor = coll.findOne();
-
-                    //or... DBCursor cursor =
-
-                /*final DBCursor cursor = coll.findOne("{}", sort);
-                    ().sort(sort).limit(1);*/
-
-                    passLat = String.valueOf(cursor.get("Latitude"));
-                    passLong = String.valueOf(cursor.get("Longitude"));
-                    //passTime = String.valueOf(cursor.get("Time"));
-                    mongoClient.close();
-
-                    return "who cares";
-
-                } catch(UnknownHostException e) {
-                    return getString(R.string.host_error); //"@string/host_error"
-                }
-            }
-            /*
-            @Override
-            protected void onPostExecute(String result) {
-                queryLat.setText(passLat);
-                queryLong.setText(passLong);
-                queryTime.setText(passTime);
-            }*/
-
-        }
 }

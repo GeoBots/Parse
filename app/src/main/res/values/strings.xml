@@ -19,7 +19,7 @@
 
     <string name="button_start_label">Start new game</string>
     <string name="button_start_msg">New game started</string>
-    <string name="button_locate_label">Check my location</string>
+    <string name="button_locate_label">Check progress</string>
     <string name="button_locate_msg">Location check initiated</string>
 
 </resources>

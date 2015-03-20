@@ -81,6 +81,7 @@
       <excludeFolder url="file://$USER_HOME$/Dropbox (UWT@CUW)/AndroidProjects/Parse/app/build/intermediates/rs" />
       <excludeFolder url="file://$USER_HOME$/Dropbox (UWT@CUW)/AndroidProjects/Parse/app/build/intermediates/symbols" />
       <excludeFolder url="file://$USER_HOME$/Dropbox (UWT@CUW)/AndroidProjects/Parse/app/build/outputs" />
+      <excludeFolder url="file://$USER_HOME$/Dropbox (UWT@CUW)/AndroidProjects/Parse/app/build/tmp" />
     </content>
     <orderEntry type="jdk" jdkName="Android API 22 Platform" jdkType="Android SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
