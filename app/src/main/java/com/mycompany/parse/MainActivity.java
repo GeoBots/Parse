@@ -396,7 +396,7 @@ public class MainActivity extends Activity implements
                             }
 
                             //display winner message
-                            Toast.makeText(this, "Congrats, You Won the Game!", Toast.LENGTH_LONG).show();
+                            Toast.makeText(this, getString(R.string.winner), Toast.LENGTH_LONG).show();
                         }
                         //compare current distance from previous to determine hot or cold
                         else if (mCurrentDistance < mPreviousDistance) {
