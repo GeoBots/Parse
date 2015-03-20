@@ -27,13 +27,15 @@ import com.mongodb.MongoClient;
 import com.mongodb.MongoClientURI;
 import com.mongodb.WriteConcern;
 import com.mongodb.WriteResult;
-import com.mycompany.Parse.R;
+import com.mycompany.parse.R;
 
 import java.net.UnknownHostException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
+import static android.widget.Toast.*;
 
 public class MainActivity extends Activity implements
         GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
@@ -49,8 +51,8 @@ public class MainActivity extends Activity implements
 
     protected Location mLastLocation;
     protected Location mPreviousLocation;
-    protected double mPreviousDistance = -1.0;
-    protected double mCurrentDistance;
+    protected double mPreviousDistance = -1.0; //a logical fallacy
+    protected double mCurrentDistance = -1.0; //a logical fallacy
     protected TextView mLatitudeText;
     protected TextView mLongitudeText;
     protected ShareActionProvider mShareActionProvider;
@@ -59,8 +61,8 @@ public class MainActivity extends Activity implements
 
     public String passLat;
     public String passLong;
-    public Boolean winnerWinner;
-    public Location hidelocation;
+    public Boolean passWinner;
+    public Location targetLocation;
 
 
 
@@ -94,15 +96,15 @@ public class MainActivity extends Activity implements
     public void onGameStartClick(View view) {
         StartGame startgame = new StartGame();
         startgame.execute();
-        Toast.makeText(this, getString(R.string.button_start_msg), Toast.LENGTH_SHORT).show();
-        Button hidebtn= (Button)findViewById(R.id.button_start);
-        Button.setEnabled(false);
+        makeText(this, getString(R.string.button_start_msg), LENGTH_SHORT).show();
+        Button startBtn= (Button)findViewById(R.id.button_start);
+        startBtn.setEnabled(false);
     }
 
     public void onLocateClick(View view) {
         CheckLocation checklocation = new CheckLocation();
         checklocation.execute();
-        Toast.makeText(this, getString(R.string.button_locate_msg), Toast.LENGTH_SHORT).show();
+        makeText(this, getString(R.string.button_locate_msg), LENGTH_SHORT).show();
     }
 
     /**
@@ -161,7 +163,7 @@ public class MainActivity extends Activity implements
             mLongitudeText.setText(String.valueOf(mLastLocation.getLongitude()));
             mShare = "I'm at " + String.valueOf(mLastLocation.getLatitude()) + " degrees latitude and " + String.valueOf(mLastLocation.getLongitude()) + " degrees longitude";
         } else {
-            Toast.makeText(this, R.string.no_location_detected, Toast.LENGTH_LONG).show();
+            makeText(this, R.string.no_location_detected, LENGTH_LONG).show();
         }
     }
     @Override
@@ -267,7 +269,7 @@ public class MainActivity extends Activity implements
     //periodically check player location and progress
     private class CheckLocation extends AsyncTask<Void, Void, String> {
         @Override
-        protected String doInBackground(Void... voids) {
+        public String doInBackground(Void... voids) {
 
             try {
                 //create connection
@@ -288,8 +290,6 @@ public class MainActivity extends Activity implements
                 DBCursor cursor = coll.find().sort(new BasicDBObject("$natural", -1));
 
 
-                //BasicDBObject WinnerQuery = new BasicDBObject("IsWinner", true);
-                //BasicDBObject TargetQuery = new BasicDBObject("Latitude", new BasicDBObject("$exists", true));
 
                 /*cursor = coll.find(query);
                 try {
@@ -306,37 +306,45 @@ public class MainActivity extends Activity implements
                 /*final DBCursor cursor = coll.findOne("{}", sort);
                     ().sort(sort).limit(1);*/
 
-                passLat = String.valueOf(cursor.one().get("Latitude"));
-                passLong = String.valueOf(cursor.one().get("Longitude"));
-                winnerWinner = Boolean.valueOf(cursor.one().get("IsWinner"));
+                //passLat = String.valueOf(cursor.one().get("Latitude"));
+                //passLong = String.valueOf(cursor.one().get("Longitude"));
+                //passWinner = Boolean.valueOf(cursor.one().get("IsWinner"));
 
-                //Location hidelocation = Double.parseDouble(passlat), Double.parseDouble(passlong);
-                //float distance = mLastLocation.distanceTo(hidelocation);
+                /*
+                BasicDBObject WinnerQuery = new BasicDBObject("IsWinner", true);
+                passWinner = WinnerQuery.get("IsWinner");
+
+                BasicDBObject TargetQuery = new BasicDBObject("Latitude", new BasicDBObject("$exists", true));
+                passLat = String.valueOf(TargetQuery.get("Latitude"));
+                passLong = String.valueOf(TargetQuery.get("Longitude"));
+                */
+                //Location targetLocation = Double.parseDouble(passlat), Double.parseDouble(passlong);
+                //float distance = mLastLocation.distanceTo(targetLocation);
                 //cursor.close();
                 //mongoClient.close();
 
                 return "who cares";
 
-                //has game been won?//check for winner: is distance is within buffer distance?
-                if (winnerWinner == true) {
-                    Toast.makeText(this, getString(R.string.winner), Toast.LENGTH_LONG).show();
+                //has game been won? check db for winner: is distance is within buffer distance?
+                if (passWinner) {
+                    Toast.makeText(this, getString(R.string.winner), LENGTH_LONG).show();
                 }
                 //else game has not been won, check progress
                 else {
-                    //check if previous distance has been calculated
+                    //it's not this player's first turn if previous location or distance has been set
                     if (mLastLocation != null) {
-                        //set previous location
+                        //save previous location before getting current location
                         mPreviousLocation = mLastLocation;
-                        //calculate previous distance
-                        double previousDistance = mPreviousLocation.distanceTo(hidelocation);
-                        //set previous distance
-                        mPreviousDistance = previousDistance;
+
+                        //save previous distance to target before updating
+                        mPreviousDistance = mCurrentDistance;
+
                         //get current lat/long position
                         mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
-                        //calculate distance to hider
-                        double distance = mLastLocation.distanceTo(hidelocation);
-                        //set current distance
-                        mCurrentDistance = distance;
+
+                        //calculate new distance to target
+                        mCurrentDistance = mLastLocation.distanceTo(targetLocation);
+
                         //check buffer distance for winner and write to the database if won
                         if (mCurrentDistance <= mBufferDistance) {
                             //write to the database, you won!
@@ -396,27 +404,27 @@ public class MainActivity extends Activity implements
                             }
 
                             //display winner message
-                            Toast.makeText(this, getString(R.string.winner), Toast.LENGTH_LONG).show();
+                            makeText(this, getString(R.string.winner), LENGTH_LONG).show();
                         }
                         //compare current distance from previous to determine hot or cold
                         else if (mCurrentDistance < mPreviousDistance) {
                             //display warmer message
-                            Toast.makeText(this, getString(R.string.warmer), Toast.LENGTH_LONG).show();
+                            makeText(this, getString(R.string.warmer), LENGTH_LONG).show();
                         } else {
                             //display colder message
-                            Toast.makeText(this, getString(R.string.colder), Toast.LENGTH_LONG).show();
+                            makeText(this, getString(R.string.colder), LENGTH_LONG).show();
                         }
                     }
-                    //calc the first distance
+                    //this is the player's first time checking location
                     else {
 
                         try {
                             //get current lat/long position
                             mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
-                            //calculate distance to hider
-                            double distance = mLastLocation.distanceTo(hidelocation);
+                            //calculate distance to target
+                            mCurrentDistance = mLastLocation.distanceTo(targetLocation);
                             //check if winner
-                            if (distance < mBufferDistance) {
+                            if (mCurrentDistance < mBufferDistance) {
                                 //write to the database, you won!
                                 try {
                                     //create connection
@@ -474,7 +482,7 @@ public class MainActivity extends Activity implements
                                 }
                             }
 
-                            Toast.makeText(this, getString(R.string.winner), Toast.LENGTH_LONG).show();
+                            makeText(this, getString(R.string.winner), LENGTH_LONG).show();
 
                         } catch (UnknownHostException e) {
                             return getString(R.string.host_error); //"@string/host_error"
@@ -490,236 +498,6 @@ public class MainActivity extends Activity implements
             }
         }
     }
-
-        @Override
-        protected void onPostExecute(String result) {
-
- /*           try {
-                //has game been won?//check for winner: is distance is within buffer distance?
-                if (winnerWinner = true) {
-                    Toast.makeText(this, "Game Over, you lost.", Toast.LENGTH_LONG).show();
-                }
-                    //else game has not been won, check progress
-                else {
-                    //check if previous distance has been calculated
-                    if (mLastLocation != null) {
-                        //set previous location
-                        mPreviousLocation = mLastLocation;
-                        //calculate previous distance
-                        double previousDistance = mPreviousLocation.distanceTo(hidelocation);
-                        //set previous distance
-                        mPreviousDistance = previousDistance;
-                        //get current lat/long position
-                        mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
-                        //calculate distance to hider
-                        double distance = mLastLocation.distanceTo(hidelocation);
-                        //set current distance
-                        mCurrentDistance = distance;
-                        //check buffer distance for winner and write to the database if won
-                        if (mCurrentDistance <= mBufferDistance) {
-                            //write to the database, you won!
-                            try {
-                                //create connection
-                                String myUri = "mongodb://findme_service:abcde12345@ds043991.mongolab.com:43991/location";
-                                String myColl = "FindMe253";
-                                MongoClientURI uri = new MongoClientURI(myUri);
-                                MongoClient mongoClient = new MongoClient(uri);
-                                DB db = mongoClient.getDB(uri.getDatabase());
-                                DBCollection coll = db.getCollection(myColl);
-
-                                SimpleDateFormat time = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss");
-                                String now = time.format(new Date());
-
-                                    *//* Mongo collection document structure:
-                                        "GameID": 1,
-                                        "PlayerID": 0,
-                                        "TimeInterval: 0,
-                                        "Latitude": 47.247005,
-                                        "Longitude": -122.438734,
-                                        "IsWinner": 0,
-                                        "Time": "2015-03-14_15:26:00"
-                                    *//*
-                                int game_id = 1;
-                                int player_id = 0;
-                                int time_interval = 0;
-                                boolean is_winner = true;
-
-                                //insert lat/long
-                                if (mLastLocation != null) {
-                                    BasicDBObject lastLocation = new BasicDBObject();
-                                    lastLocation.put("GameID", game_id);
-                                    lastLocation.put("PlayerID", player_id);
-                                    lastLocation.put("TimeInterval", time_interval);
-                                    lastLocation.put("Latitude", mLastLocation.getLatitude());
-                                    lastLocation.put("Longitude", mLastLocation.getLongitude());
-                                    lastLocation.put("IsWinner", is_winner);
-                                    lastLocation.put("Time", String.valueOf(now));
-
-                                    WriteResult result = coll.insert(lastLocation, WriteConcern.SAFE);
-                                    //Log.i(result.toString());
-
-                                    mongoClient.close();
-
-                                    //if push notifications work, notify other players of game start
-                                    //otherwise, use manual sms ;-)
-
-                                    return getString(R.string.submit_label); //"@string/submit_label"
-                                } else {
-                                    mongoClient.close();
-                                    return getString(R.string.submit_error); //"@string/submit_error"
-                                }
-
-                            } catch (UnknownHostException e) {
-                                return getString(R.string.host_error); //"@string/host_error"
-                            }
-
-                            //display winner message
-                            Toast.makeText(this, "Congrats, You Won the Game!", Toast.LENGTH_LONG).show();
-                        }
-                        //compare current distance from previous to determine hot or cold
-                        else if (mCurrentDistance < mPreviousDistance) {
-                            //display warmer message
-                            Toast.makeText(this, "Warmer", Toast.LENGTH_LONG).show();
-                        } else {
-                            //display colder message
-                            Toast.makeText(this, "Colder", Toast.LENGTH_LONG).show();
-                        }
-                    }
-                    //calc the first distance
-                    else {
-
-                        try {
-                            //get current lat/long position
-                            mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
-                            //calculate distance to hider
-                            double distance = mLastLocation.distanceTo(hidelocation);
-                            //check if winner
-                            if (distance < mBufferDistance) {
-                                //write to the database, you won!
-                                try {
-                                    //create connection
-                                    String myUri = "mongodb://findme_service:abcde12345@ds043991.mongolab.com:43991/location";
-                                    String myColl = "FindMe253";
-                                    MongoClientURI uri = new MongoClientURI(myUri);
-                                    MongoClient mongoClient = new MongoClient(uri);
-                                    DB db = mongoClient.getDB(uri.getDatabase());
-                                    DBCollection coll = db.getCollection(myColl);
-
-                                    SimpleDateFormat time = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss");
-                                    String now = time.format(new Date());
-
-                                    *//* Mongo collection document structure:
-                                        "GameID": 1,
-                                        "PlayerID": 0,
-                                        "TimeInterval: 0,
-                                        "Latitude": 47.247005,
-                                        "Longitude": -122.438734,
-                                        "IsWinner": 0,
-                                        "Time": "2015-03-14_15:26:00"
-                                    *//*
-                                    int game_id = 1;
-                                    int player_id = 0;
-                                    int time_interval = 0;
-                                    boolean is_winner = true;
-
-                                    //insert lat/long
-                                    if (mLastLocation != null) {
-                                        BasicDBObject lastLocation = new BasicDBObject();
-                                        lastLocation.put("GameID", game_id);
-                                        lastLocation.put("PlayerID", player_id);
-                                        lastLocation.put("TimeInterval", time_interval);
-                                        lastLocation.put("Latitude", mLastLocation.getLatitude());
-                                        lastLocation.put("Longitude", mLastLocation.getLongitude());
-                                        lastLocation.put("IsWinner", is_winner);
-                                        lastLocation.put("Time", String.valueOf(now));
-
-                                        WriteResult result = coll.insert(lastLocation, WriteConcern.SAFE);
-                                        //Log.i(result.toString());
-
-                                        mongoClient.close();
-
-                                        //if push notifications work, notify other players of game start
-                                        //otherwise, use manual sms ;-)
-
-                                        return getString(R.string.submit_label); //"@string/submit_label"
-                                    } else {
-                                        mongoClient.close();
-                                        return getString(R.string.submit_error); //"@string/submit_error"
-                                    }
-
-                                } catch (UnknownHostException e) {
-                                    return getString(R.string.host_error); //"@string/host_error"
-                                }
-                            }
-
-
-                            Toast.makeText(this, "Congrats, You Won the Game!", Toast.LENGTH_LONG).show();
-
-
-                        } catch (UnknownHostException e) {
-                            return getString(R.string.host_error); //"@string/host_error"
-                        }
-                    }
-                }
-
-            return getString(R.string.button_locate_msg);
-         //error handling
-        }catch (UnknownHostException e) {
-                return getString(R.string.host_error); //"@string/host_error"
-            }
-    }
-*/
-
-//all of this below was originally in QueryActivity.java. Attempting to merge here.
-//need to reconfigure into three game classes above
-
-
-    public class QueryActivity extends Activity {
-
-        protected TextView queryLat;
-        protected TextView queryLong;
-        protected TextView queryTime;
-
-        public String passLat;
-        public String passLong;
-        public String passTime;
-
-        /*@Override
-        protected void onCreate(Bundle savedInstanceState) {
-            super.onCreate(savedInstanceState);
-            setContentView(R.layout.activity_main);
-
-            QueryLocation queryLocation = new QueryLocation();
-            queryLocation.execute();
-
-            queryLat = (TextView) findViewById(R.id.latitude_text);
-            queryLong = (TextView) findViewById(R.id.longitude_text);
-            //queryTime = (TextView) findViewById(R.id.time_query);
-
-        }*/
-
-
-        /*@Override
-        public boolean onCreateOptionsMenu(Menu menu) {
-         Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_query, menu);
-        return true;
-    }*/
-
-        @Override
-        public boolean onOptionsItemSelected(MenuItem item) {
-            // Handle action bar item clicks here. The action bar will
-            // automatically handle clicks on the Home/Up button, so long
-            // as you specify a parent activity in AndroidManifest.xml.
-            int id = item.getItemId();
-
-            //noinspection SimplifiableIfStatement
-            if (id == R.id.action_settings) {
-                return true;
-            }
-
-            return super.onOptionsItemSelected(item);
-        }
 
 
         private class QueryLocation extends AsyncTask<Void, Void, String> {
@@ -748,7 +526,7 @@ public class MainActivity extends Activity implements
 
                     passLat = String.valueOf(cursor.get("Latitude"));
                     passLong = String.valueOf(cursor.get("Longitude"));
-                    passTime = String.valueOf(cursor.get("Time"));
+                    //passTime = String.valueOf(cursor.get("Time"));
                     mongoClient.close();
 
                     return "who cares";
@@ -757,14 +535,13 @@ public class MainActivity extends Activity implements
                     return getString(R.string.host_error); //"@string/host_error"
                 }
             }
-
+            /*
             @Override
             protected void onPostExecute(String result) {
                 queryLat.setText(passLat);
                 queryLong.setText(passLong);
                 queryTime.setText(passTime);
-            }
+            }*/
 
         }
-    }
 }
