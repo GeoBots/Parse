@@ -44,6 +44,9 @@ public class MainActivity extends Activity implements
     private GoogleApiClient mGoogleApiClient;
 
     protected Location mLastLocation;
+    protected Location mPreviousLocation;
+    protected double mPreviousDistance = -1.0;
+    protected double mCurrentDistance;
     protected TextView mLatitudeText;
     protected TextView mLongitudeText;
     protected ShareActionProvider mShareActionProvider;
@@ -264,6 +267,9 @@ public class MainActivity extends Activity implements
                 DBCollection coll = db.getCollection(myColl);
 
                 /*
+                Since two records will be written per game, if record set is greater than one game over
+                other way iterate through records to determine iswinner true
+                filter database for game ID or wipe database every game
                 DBObject sort = new BasicDBObject("$natural", "-1");
                 DBObject q = new BasicDBObject();*/
 
@@ -274,12 +280,12 @@ public class MainActivity extends Activity implements
                 /*final DBCursor cursor = coll.findOne("{}", sort);
                     ().sort(sort).limit(1);*/
 
-                passLat = String.valueOf(cursor.get("Latitude"));
-                passLong = String.valueOf(cursor.get("Longitude"));
-                winnerWinner = Boolean.valueOf(cursor.get("IsWinner"));
+                passLat = String.valueOf(cursor.one().get("Latitude"));
+                passLong = String.valueOf(cursor.one().get("Longitude"));
+                winnerWinner = Boolean.valueOf(cursor.one().get("IsWinner"));
 
-                Location hidelocation = Double.parseDouble(passlat), Double.parseDouble(passlong);
-                float distance = mLastLocation.distanceTo(hidelocation);
+                //Location hidelocation = Double.parseDouble(passlat), Double.parseDouble(passlong);
+                //float distance = mLastLocation.distanceTo(hidelocation);
                 cursor.close();
                 mongoClient.close();
 
@@ -294,29 +300,66 @@ public class MainActivity extends Activity implements
         protected void onPostExecute(String result) {
 
             try {
-                if (winnerWinner = false) {
+                //has game been won?//check for winner: is distance is within buffer distance?
+                if (winnerWinner = true) {
+                    Toast.makeText(this, "Game Over, you lost.", Toast.LENGTH_LONG).show();
+                }
+                    //else game has not been won, check progress
+                else {
+                    //check if previous distance has been calculated
+                    if (mPreviousDistance >= 0){
+                        //get current lat/long position
+                        mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+                        //calculate distance to hider
+                        double distance = mLastLocation.distanceTo(hidelocation);
+                        //set current distance
+                        mCurrentDistance = distance;
+                            if (mCurrentDistance < mPreviousDistance) {
+                                Toast.makeText(this, "Warmer", Toast.LENGTH_LONG).show();
+                            }
+                            else{
+                                Toast.makeText(this, "Colder", Toast.LENGTH_LONG).show();
+                            }
+
+                    }
+                    //calc the first distance
+                    else {
+                        //get current lat/long position
+                        mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+                        //calculate distance to hider
+                        double distance = mLastLocation.distanceTo(hidelocation);
+                        //set previous distance to variable
+                        mPreviousDistance = distance;
+                    }
+                    //save old lat/long to previous variables
+                    mPreviousLocation = mLastLocation;
+                    //save last distance calc
+                    mPreviousDistance = distance;
+                    //get current lat/long position
                     mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
-                    float distance = mLastLocation.distanceTo(hidelocation);
+                    //calculate distance to hider
+                    double distance = mLastLocation.distanceTo(hidelocation);
 
-                }
-                else if (distance <= 75) {
-                    //you win somehow and post to database
+                    if (distance <= 75) {
+                        //you win somehow and post to database
 
-                    Toast.makeText(this, "Game Over", Toast.LENGTH_LONG).show();
-                }
-                else if (distance > 75) {
+                        Toast.makeText(this, "Game Over", Toast.LENGTH_LONG).show();
+                    }
+                    else {
 
+                    }
                 }
+
 
         }
 
-            //save old lat/long to previous variables
 
-            //get current lat/long position
 
-            //calculate distance to hider
 
-            //check for winner: is distance is within buffer distance?
+
+
+
+
 
                 //if yes, end game:
                     //notify other players of winner
