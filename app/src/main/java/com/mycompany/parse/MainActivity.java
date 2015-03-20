@@ -309,7 +309,7 @@ public class MainActivity extends Activity implements
                     //else game has not been won, check progress
                 else {
                     //check if previous distance has been calculated
-                    if (mLastLocation != null){
+                    if (mLastLocation != null) {
                         //set previous location
                         mPreviousLocation = mLastLocation;
                         //calculate previous distance
@@ -322,89 +322,8 @@ public class MainActivity extends Activity implements
                         double distance = mLastLocation.distanceTo(hidelocation);
                         //set current distance
                         mCurrentDistance = distance;
-                            //check buffer distance for winner and write to the database if won
-                            if (mCurrentDistance <= mBufferDistance) {
-                                //write to the database, you won!
-                                    try {
-                                        //create connection
-                                        String myUri = "mongodb://findme_service:abcde12345@ds043991.mongolab.com:43991/location";
-                                        String myColl = "FindMe253";
-                                        MongoClientURI uri = new MongoClientURI(myUri);
-                                        MongoClient mongoClient = new MongoClient(uri);
-                                        DB db = mongoClient.getDB(uri.getDatabase());
-                                        DBCollection coll = db.getCollection(myColl);
-
-                                        SimpleDateFormat time = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss");
-                                        String now = time.format(new Date());
-
-                                    /* Mongo collection document structure:
-                                        "GameID": 1,
-                                        "PlayerID": 0,
-                                        "TimeInterval: 0,
-                                        "Latitude": 47.247005,
-                                        "Longitude": -122.438734,
-                                        "IsWinner": 0,
-                                        "Time": "2015-03-14_15:26:00"
-                                    */
-                                        int game_id = 1;
-                                        int player_id = 0;
-                                        int time_interval = 0;
-                                        boolean is_winner = true;
-
-                                        //insert lat/long
-                                        if (mLastLocation != null) {
-                                            BasicDBObject lastLocation = new BasicDBObject();
-                                            lastLocation.put("GameID", game_id);
-                                            lastLocation.put("PlayerID", player_id);
-                                            lastLocation.put("TimeInterval", time_interval);
-                                            lastLocation.put("Latitude", mLastLocation.getLatitude());
-                                            lastLocation.put("Longitude", mLastLocation.getLongitude());
-                                            lastLocation.put("IsWinner", is_winner);
-                                            lastLocation.put("Time", String.valueOf(now));
-
-                                            WriteResult result = coll.insert(lastLocation, WriteConcern.SAFE);
-                                            //Log.i(result.toString());
-
-                                            mongoClient.close();
-
-                                            //if push notifications work, notify other players of game start
-                                            //otherwise, use manual sms ;-)
-
-                                            return getString(R.string.submit_label); //"@string/submit_label"
-                                        }
-                                        else {
-                                            mongoClient.close();
-                                            return getString(R.string.submit_error); //"@string/submit_error"
-                                        }
-
-                                    } catch(UnknownHostException e) {
-                                        return getString(R.string.host_error); //"@string/host_error"
-                                    }
-                                }
-
-
-
-                                Toast.makeText(this, "Congrats, You Won the Game!", Toast.LENGTH_LONG).show();
-                            }
-                            //compare current distance from previous to determine hot or cold
-                            else if (mCurrentDistance < mPreviousDistance) {
-                                Toast.makeText(this, "Warmer", Toast.LENGTH_LONG).show();
-                            }
-                            else{
-                                Toast.makeText(this, "Colder", Toast.LENGTH_LONG).show();
-                            }
-
-                    }
-                    //calc the first distance
-                    else {
-
-                        try {
-                        //get current lat/long position
-                        mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
-                        //calculate distance to hider
-                        double distance = mLastLocation.distanceTo(hidelocation);
-                        //check if winner
-                        if (distance < mBufferDistance) {
+                        //check buffer distance for winner and write to the database if won
+                        if (mCurrentDistance <= mBufferDistance) {
                             //write to the database, you won!
                             try {
                                 //create connection
@@ -452,45 +371,103 @@ public class MainActivity extends Activity implements
                                     //otherwise, use manual sms ;-)
 
                                     return getString(R.string.submit_label); //"@string/submit_label"
-                                }
-                                else {
+                                } else {
                                     mongoClient.close();
                                     return getString(R.string.submit_error); //"@string/submit_error"
                                 }
 
-                            } catch(UnknownHostException e) {
+                            } catch (UnknownHostException e) {
                                 return getString(R.string.host_error); //"@string/host_error"
                             }
+
+                            //display winner message
+                            Toast.makeText(this, "Congrats, You Won the Game!", Toast.LENGTH_LONG).show();
                         }
+                        //compare current distance from previous to determine hot or cold
+                        else if (mCurrentDistance < mPreviousDistance) {
+                            //display warmer message
+                            Toast.makeText(this, "Warmer", Toast.LENGTH_LONG).show();
+                        } else {
+                            //display colder message
+                            Toast.makeText(this, "Colder", Toast.LENGTH_LONG).show();
+                        }
+                    }
+                    //calc the first distance
+                    else {
+
+                        try {
+                            //get current lat/long position
+                            mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+                            //calculate distance to hider
+                            double distance = mLastLocation.distanceTo(hidelocation);
+                            //check if winner
+                            if (distance < mBufferDistance) {
+                                //write to the database, you won!
+                                try {
+                                    //create connection
+                                    String myUri = "mongodb://findme_service:abcde12345@ds043991.mongolab.com:43991/location";
+                                    String myColl = "FindMe253";
+                                    MongoClientURI uri = new MongoClientURI(myUri);
+                                    MongoClient mongoClient = new MongoClient(uri);
+                                    DB db = mongoClient.getDB(uri.getDatabase());
+                                    DBCollection coll = db.getCollection(myColl);
+
+                                    SimpleDateFormat time = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss");
+                                    String now = time.format(new Date());
+
+                                    /* Mongo collection document structure:
+                                        "GameID": 1,
+                                        "PlayerID": 0,
+                                        "TimeInterval: 0,
+                                        "Latitude": 47.247005,
+                                        "Longitude": -122.438734,
+                                        "IsWinner": 0,
+                                        "Time": "2015-03-14_15:26:00"
+                                    */
+                                    int game_id = 1;
+                                    int player_id = 0;
+                                    int time_interval = 0;
+                                    boolean is_winner = true;
+
+                                    //insert lat/long
+                                    if (mLastLocation != null) {
+                                        BasicDBObject lastLocation = new BasicDBObject();
+                                        lastLocation.put("GameID", game_id);
+                                        lastLocation.put("PlayerID", player_id);
+                                        lastLocation.put("TimeInterval", time_interval);
+                                        lastLocation.put("Latitude", mLastLocation.getLatitude());
+                                        lastLocation.put("Longitude", mLastLocation.getLongitude());
+                                        lastLocation.put("IsWinner", is_winner);
+                                        lastLocation.put("Time", String.valueOf(now));
+
+                                        WriteResult result = coll.insert(lastLocation, WriteConcern.SAFE);
+                                        //Log.i(result.toString());
+
+                                        mongoClient.close();
+
+                                        //if push notifications work, notify other players of game start
+                                        //otherwise, use manual sms ;-)
+
+                                        return getString(R.string.submit_label); //"@string/submit_label"
+                                    } else {
+                                        mongoClient.close();
+                                        return getString(R.string.submit_error); //"@string/submit_error"
+                                    }
+
+                                } catch (UnknownHostException e) {
+                                    return getString(R.string.host_error); //"@string/host_error"
+                                }
+                            }
 
 
+                            Toast.makeText(this, "Congrats, You Won the Game!", Toast.LENGTH_LONG).show();
 
-                        Toast.makeText(this, "Congrats, You Won the Game!", Toast.LENGTH_LONG).show();
 
-
-                    }catch(UnknownHostException e) {
+                        } catch (UnknownHostException e) {
                             return getString(R.string.host_error); //"@string/host_error"
+                        }
+                    }
                 }
-            }
-
-
-
-
-
-
-
-
-
-                //if yes, end game:
-                    //notify other players of winner
-
-                    //write result to db
-
-               //else keep playing:
-                    //compare current distance to old distance
-
-                    //display warm/cold message
-
 
             return getString(R.string.button_locate_msg);
         }
