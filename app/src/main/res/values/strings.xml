@@ -12,6 +12,7 @@
     <string name="host_error">"Unknown Host Exception, yo!!"</string>
     <string name="title_activity_query">QueryActivity</string>
 
+    <string name="status">Checking status.</string>
     <string name="colder">DARN. You are getting colder.</string>
     <string name="warmer">GOOD! You are getting warmer.</string>
     <string name="winner">YOU ARE THE WINNER !!!</string>
