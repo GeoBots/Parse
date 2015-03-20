@@ -470,7 +470,10 @@ public class MainActivity extends Activity implements
                 }
 
             return getString(R.string.button_locate_msg);
-        }
+         //error handling
+        }catch (UnknownHostException e) {
+                return getString(R.string.host_error); //"@string/host_error"
+            }
     }
 
 
