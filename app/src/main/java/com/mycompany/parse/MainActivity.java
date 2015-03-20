@@ -9,6 +9,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ShareActionProvider;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -94,6 +95,8 @@ public class MainActivity extends Activity implements
         StartGame startgame = new StartGame();
         startgame.execute();
         Toast.makeText(this, getString(R.string.button_start_msg), Toast.LENGTH_SHORT).show();
+        Button hidebtn= (Button)findViewById(R.id.button_start);
+        Button.setEnabled(false);
     }
 
     public void onLocateClick(View view) {
